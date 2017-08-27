@@ -3,7 +3,8 @@
 
 __author__="NJ"
 
-import asyncio, logging
+import logging; logging.basicConfig(level=logging.INFO)
+import asyncio
 import aiomysql
 
 
@@ -20,9 +21,9 @@ async def create_pool(loop, **kw):
 	__pool = await aiomysql.create_pool(
 		host = kw.get('host', 'localhost'),
 		port = kw.get('port', 3306),
-		user = kw.get['user'],
-		password = kw.get['password'],
-		db = kw.get['db'],
+		user = kw['user'],
+		password = kw['password'],
+		db = kw['db'],
 		charset = kw.get('charset', 'utf8'),
 		autocommit = kw.get('autocommit', True),
 		maxsize = kw.get('maxsize', 10),
@@ -115,7 +116,7 @@ class FloatField(Field):
 		super().__init__(name, 'real', primary_key, default)
 
 
-class TextField(object):
+class TextField(Field):
 	"""docstring for TextField"""
 	def __init__(self, name=None, default=None):
 		super().__init__(name, 'text', False, default)
@@ -131,7 +132,7 @@ class ModelMetaclass(type):
 		mappings = dict()
 		fields = []
 		primarykey = None
-		for k, v in attrs.item():
+		for k, v in attrs.items():
 			if isinstance(v, Field):
 				logging.info('found mapping: %s ==> %s' % (k, v))
 				mappings[k] = v
@@ -181,10 +182,10 @@ class Model(dict, metaclass=ModelMetaclass):
 		value = getattr(self, key, None)
 		if value is None:
 			field = self.__mappings__[key]
-			if field.default is None:
+			if field.default is not None:
 				value = field.default() if callable(field.default) else field.default
 				logging.info('using default value for %s : %s' % (key, str(value)))
-				setattr(setattr, key, value)
+				setattr(self, key, value)
 		return value
 
 
