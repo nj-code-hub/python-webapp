@@ -44,7 +44,7 @@ def post(path):
 def get_required_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
-    for name, param in params.item():
+    for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY or param.default == inspect.Parameter.empty:
             args.append(name)
     return tuple(args)
@@ -53,7 +53,7 @@ def get_required_kw_args(fn):
 def get_named_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
-    for name, param in params.item():
+    for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
             args.append(name)
     return tuple(args)
@@ -100,7 +100,7 @@ class RequestHandler(object):
 
     async def __call__(self, request):
         kw = None
-        if _has_var_kw_arg or _has_named_kw_args or _required_kw_args:
+        if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
             if request.method == 'POST':
                 if not request.content_type:
                     return web.HTTPBadRequest('Missing Content-Type.')
